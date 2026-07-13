@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  role      UserRole
+  password  String
+  createdAt DateTime  @default(now())
+}
+
+enum UserRole {
+  ADMIN
+  OWNER
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  address     String
+  description String?
+  photos      String[]
+  phone       String?
+  email       String?
+  operationalHours String?  // e.g., "08:00 - 20:00"
+  latitude   Float?
+  longitude  Float?
+  units       Unit[]
+  createdAt   DateTime @default(now())
+}
+
+model Unit {
+  id           String        @id @default(cuid())
+  propertyId   String
+  property     Property      @relation(fields: [propertyId], references: [id])
+  name         String
+  unitNumber   String
+  type         UnitType
+  slug         String        @unique
+  pricePerMonth Decimal?
+  pricePerNight Decimal?
+  facilities   String[]
+  photos       String[]
+  description  String?
+  status       UnitStatus    @default(AVAILABLE)
+  bookings     Booking[]
+  tenants      Tenant[]
+  invoices     Invoice[]
+  createdAt    DateTime      @default(now())
+}
+
+enum UnitType {
+  KOS_BULANAN
+  KOS_HARIAN
+  GUEST_HOUSE
+  VILLA
+}
+
+enum UnitStatus {
+  AVAILABLE
+  BOOKED
+  OCCUPIED
+  MAINTENANCE
+}
+
+model Booking {
+  id              String        @id @default(cuid())
+  bookingNumber   String        @unique
+  unitId          String
+  unit            Unit          @relation(fields: [unitId], references: [id])
+  guestName       String
+  guestPhone      String
+  guestEmail      String
+  checkInDate     DateTime
+  durationMonths  Int?
+  durationNights  Int?
+  notes           String?
+  status          BookingStatus @default(PENDING)
+  rejectionReason String?
+  confirmedAt     DateTime?
+  checkedInAt    DateTime?
+  checkedOutAt   DateTime?
+  tenant          Tenant?
+  invoices        Invoice[]
+  events          BookingEvent[]
+  createdAt       DateTime      @default(now())
+}
+
+model BookingEvent {
+  id         String   @id @default(cuid())
+  bookingId  String
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  eventType  String   // "CREATED", "CONFIRMED", "TENANT_CREATED", "INVOICE_SENT", "PAID", "CHECKED_IN", "CHECKOUT", "REJECTED", "CANCELLED"
+  message    String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  WAITING_PAYMENT
+  PAID
+  CHECKED_IN
+  CHECKOUT
+  REJECTED
+  CANCELLED
+}
+
+model Tenant {
+  id              String    @id @default(cuid())
+  bookingId       String    @unique
+  booking         Booking   @relation(fields: [bookingId], references: [id])
+  unitId          String
+  unit            Unit      @relation(fields: [unitId], references: [id])
+  name            String
+  email           String    @unique
+  passwordHash    String
+  phone           String
+  contractStart   DateTime
+  contractEnd     DateTime?
+  emergencyName   String?
+  emergencyPhone  String?
+  isActive        Boolean   @default(true)
+  invoices        Invoice[]
+  notifications   Notification[]
+  createdAt       DateTime  @default(now())
+}
+
+model Invoice {
+  id              String        @id @default(cuid())
+  invoiceNumber   String        @unique
+  tenantId        String
+  tenant          Tenant        @relation(fields: [tenantId], references: [id])
+  unitId          String
+  unit            Unit          @relation(fields: [unitId], references: [id])
+  bookingId       String?
+  booking         Booking?       @relation(fields: [bookingId], references: [id])
+  period          String
+  rentAmount      Decimal
+  electricAmount  Decimal       @default(0)
+  waterAmount     Decimal       @default(0)
+  otherAmount     Decimal       @default(0)
+  otherDescription String?
+  totalAmount     Decimal
+  dueDate         DateTime
+  status          InvoiceStatus @default(UNPAID)
+  paidAt          DateTime?
+  paymentMethod   String?
+  paymentProofUrl String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PAID
+  OVERDUE
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  recipient  NotificationRecipient
+  type       NotificationType
+  title      String
+  message    String
+  entityId   String
+  entityType String
+  isRead     Boolean  @default(false)
+  tenantId   String?
+  tenant     Tenant?  @relation(fields: [tenantId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+enum NotificationRecipient {
+  ADMIN
+  TENANT
+}
+
+enum NotificationType {
+  // Admin notifications
+  BOOKING_NEW
+  BOOKING_CONFIRMED
+  PAYMENT_RECEIVED
+  CHECKIN_READY
+  OVERDUE_OCCURRED
+  CONTRACT_EXPIRING
+  UNIT_MAINTENANCE
+
+  // Tenant notifications
+  ACCOUNT_SETUP
+  PAYMENT_REMINDER
+  PAYMENT_CONFIRMED
+  CHECKIN_READY_TENANT
+  OVERDUE_NOTICE
+  CONTRACT_EXPIRING_TENANT
+}
+
+model BankAccount {
+  id            String   @id @default(cuid())
+  bankName      String
+  accountName   String
+  accountNumber String
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Property settings - single row for all settings
+model PropertySettings {
+  id                     String   @id @default(cuid())
+
+  // Booking Rules
+  defaultCheckInTime     String   @default("14:00")
+  defaultCheckOutTime     String   @default("12:00")
+  minimumStayNights      Int      @default(1)
+  maximumAdvanceBooking   Int      @default(90)  // days
+  depositPercentage      Int      @default(100) // percentage of monthly rent
+
+  // Invoice Settings
+  defaultDueDateDays    Int      @default(7)
+  lateFeePercentage      Int      @default(2)   // per day
+
+  // Notification Settings
+  whatsappOwner          String?
+  emailOwner            String?
+  notifyNewBooking       Boolean  @default(true)
+  notifyPaymentReceived  Boolean  @default(true)
+  notifyOverdue          Boolean  @default(true)
+  notifyVacancyReport    Boolean  @default(true)  // Email weekly vacancy report
+  reminderDays           String   @default("1,3,7") // comma-separated days before due
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
