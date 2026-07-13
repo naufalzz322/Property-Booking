@@ -7,11 +7,18 @@ import { getPropertyName } from "@/lib/property";
 const inter = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata() {
-  const propertyName = await getPropertyName();
-  return {
-    title: `${propertyName} - Property Management`,
-    description: `Sistem manajemen properti ${propertyName}`,
-  } satisfies Metadata;
+  try {
+    const propertyName = await getPropertyName();
+    return {
+      title: `${propertyName} - Property Management`,
+      description: `Sistem manajemen properti ${propertyName}`,
+    } satisfies Metadata;
+  } catch {
+    return {
+      title: "Property Management",
+      description: "Sistem manajemen properti",
+    } satisfies Metadata;
+  }
 }
 
 export default function RootLayout({
