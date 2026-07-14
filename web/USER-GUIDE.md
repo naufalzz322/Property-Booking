@@ -1,502 +1,502 @@
-# User Guide: Property Booking Platform
+# Panduan Pengguna: Platform Pemesanan Properti
 
-> **Demo Testing Guide for Non-Technical Testers**
-
----
-
-## 1. Introduction
-
-### What is this System?
-
-The **Property Booking Platform** is a complete property management system for managing room rentals, tenant billing, and automated notifications. It consists of two portals:
-
-- **Admin Portal** — For property managers to manage bookings, tenants, invoices, and system settings
-- **Tenant Portal** — For renters to view their unit, pay invoices, and communicate with management
-
-### Who is This Guide For?
-
-This guide is designed for:
-- Non-technical testers evaluating the demo
-- Stakeholders reviewing the system
-- Business users understanding the workflow
-
-### What You Need
-
-- A modern web browser (Chrome, Firefox, Edge, Safari)
-- Internet connection
-- Demo credentials provided below
+> **Panduan Pengujian Demo untuk Penguji Non-Teknis**
 
 ---
 
-## 2. How to Access the System
+## 1. Pendahuluan
 
-### Admin Portal
+### Apa Itu Sistem Ini?
+
+**Platform Pemesanan Properti** adalah sistem manajemen properti lengkap untuk mengelola penyewaan kamar, penagihan penyewa, dan notifikasi otomatis. Sistem ini terdiri dari dua portal:
+
+- **Portal Admin** — Untuk manajer properti dalam mengelola pemesanan, penyewa, invoice, dan pengaturan sistem
+- **Portal Penyewa** — Untuk penyewa dalam melihat unit mereka, membayar invoice, dan berkomunikasi dengan pengelola
+
+### Siapa yang Harus Membaca Panduan Ini?
+
+Panduan ini dirancang untuk:
+- Penguji non-teknis yang mengevaluasi demo
+- Pemangku kepentingan yang meninjau sistem
+- Pengguna bisnis yang memahami alur kerja
+
+### Apa yang Anda Butuhkan
+
+- Browser web modern (Chrome, Firefox, Edge, Safari)
+- Koneksi internet
+- Kredensial demo yang disediakan di bawah
+
+---
+
+## 2. Cara Mengakses Sistem
+
+### Portal Admin
 
 **URL:** `http://localhost:3000/admin/login`
 
-| Role | Email | Password |
-|------|-------|----------|
+| Peran | Email | Kata Sandi |
+|-------|-------|------------|
 | Admin | admin@grahamaju.com | admin123 |
-| Owner | owner@grahamaju.com | owner123 |
+| Pemilik | owner@grahamaju.com | owner123 |
 
-### Tenant Portal
+### Portal Penyewa
 
 **URL:** `http://localhost:3000/tenant/login`
 
-Demo tenant accounts are pre-filled on the login page for easy testing.
+Akun demo penyewa sudah terisi di halaman login untuk memudahkan pengujian.
 
-### Public Pages
+### Halaman Publik
 
-| Page | URL |
-|------|-----|
-| Landing Page | `http://localhost:3000/` |
-| Room Listing | `http://localhost:3000/kamar` |
-| Booking Form | `http://localhost:3000/kamar/[unit-slug]` |
-| Booking Confirmation | `http://localhost:3000/booking/confirm` |
+| Halaman | URL |
+|---------|-----|
+| Halaman Utama | `http://localhost:3000/` |
+| Daftar Kamar | `http://localhost:3000/kamar` |
+| Formulir Pemesanan | `http://localhost:3000/kamar/[unit-slug]` |
+| Konfirmasi Pemesanan | `http://localhost:3000/booking/confirm` |
 
 ---
 
-## 3. Admin Portal Features
+## 3. Fitur Portal Admin
 
 ### 3.1 Dashboard
 
 **Path:** `/admin/dashboard`
 
-The dashboard shows an overview of your property:
+Dashboard menampilkan ringkasan properti Anda:
 
-- **Occupancy Statistics** — Percentage of units currently occupied
-- **Revenue Summary** — Monthly income from rentals
-- **Pending Bookings** — Number of bookings awaiting confirmation
-- **Recent Alerts** — System notifications (overdue payments, expiring contracts)
+- **Statistik Hunian** — Persentase unit yang sedang dihuni
+- **Ringkasan Pendapatan** — Penghasilan bulanan dari sewa
+- **Pemesanan Menunggu** — Jumlah pemesanan yang menunggu konfirmasi
+- **Pemberitahuan Terbaru** — Notifikasi sistem (pembayaran terlambat, kontrak hampir habis)
 
-### 3.2 Booking Management
+### 3.2 Manajemen Pemesanan
 
 **Path:** `/admin/booking`
 
-Bookings are displayed in a **Kanban board** with the following columns:
+Pemesanan ditampilkan dalam **Papan Kanban** dengan kolom berikut:
 
-| Status | Description |
-|--------|-------------|
-| PENDING | New booking requests awaiting review |
-| CONFIRMED | Approved bookings, awaiting check-in |
-| CHECKED_IN | Tenant has moved in |
-| COMPLETED | Stay has ended |
-| CANCELLED | Rejected or cancelled bookings |
+| Status | Deskripsi |
+|--------|------------|
+| PENDING | Permintaan pemesanan baru menunggu review |
+| CONFIRMED | Pemesanan disetujui, menunggu check-in |
+| CHECKED_IN | Penyewa sudah pindah masuk |
+| COMPLETED | Masa tinggal sudah berakhir |
+| CANCELLED | Pemesanan ditolak atau dibatalkan |
 
-#### How to Process a Booking
+#### Cara Memproses Pemesanan
 
-1. Click on a **PENDING** booking card
-2. Review guest details (name, contact, dates, notes)
-3. Choose an action:
-   - **Confirm** — Approves the booking and sends confirmation email/WhatsApp
-   - **Reject** — Cancels with rejection notification to guest
-4. After confirming, click **"Create Tenant"** to set up the tenant account
+1. Klik kartu pemesanan berstatus **PENDING**
+2. Review detail tamu (nama, kontak, tanggal, catatan)
+3. Pilih aksi:
+   - **Konfirmasi** — Menyetujui pemesanan dan mengirim email/WhatsApp konfirmasi
+   - **Tolak** — Membatalkan dengan notifikasi penolakan ke tamu
+4. Setelah mengkonfirmasi, klik **"Buat Tenant"** untuk membuat akun penyewa
 
-> **Note:** Creating a tenant automatically generates the first invoice for the rental period.
+> **Catatan:** Membuat tenant secara otomatis menghasilkan invoice pertama untuk periode sewa.
 
-### 3.3 Tenant Management
+### 3.3 Manajemen Tenant
 
 **Path:** `/admin/tenant`
 
-View all registered tenants with:
-- Name and contact information
-- Assigned unit
-- Contract status (Active/Expired)
-- Outstanding balance
+Lihat semua penyewa terdaftar dengan informasi:
+- Nama dan kontak
+- Unit yang ditugaskan
+- Status kontrak (Aktif/Habis)
+- Saldo tertunggak
 
-### 3.4 Invoice Management
+### 3.4 Manajemen Invoice
 
 **Path:** `/admin/invoice`
 
-Invoices are shown with status badges:
+Invoice ditampilkan dengan status:
 
-| Status | Color | Description |
-|--------|-------|-------------|
-| UNPAID | Yellow | Awaiting payment |
-| OVERDUE | Red | Past due date |
-| PAID | Green | Payment confirmed |
+| Status | Warna | Deskripsi |
+|--------|-------|------------|
+| UNPAID | Kuning | Menunggu pembayaran |
+| OVERDUE | Merah | Melewati jatuh tempo |
+| PAID | Hijau | Pembayaran terkonfirmasi |
 
-#### Confirming a Payment
+#### Cara Mengkonfirmasi Pembayaran
 
-1. Find the invoice (filter by status if needed)
-2. Click on the invoice to view details
-3. Check the **payment proof image**
-4. Click **"Konfirmasi Pembayaran"** to mark as paid
-5. System sends confirmation notification to tenant
+1. Cari invoice (filter berdasarkan status jika perlu)
+2. Klik invoice untuk melihat detail
+3. Periksa **bukti pembayaran**
+4. Klik **"Konfirmasi Pembayaran"** untuk menandai lunas
+5. Sistem mengirim notifikasi konfirmasi ke penyewa
 
-### 3.5 Unit Management
+### 3.5 Manajemen Unit
 
 **Path:** `/admin/unit`
 
-Each unit shows:
-- Unit number/name
-- Price per month
-- Status indicator
+Setiap unit menampilkan:
+- Nomor/nama unit
+- Harga per bulan
+- Indikator status
 
-| Status | Meaning |
-|--------|---------|
-| Available | Ready for booking |
-| Occupied | Currently rented |
-| Maintenance | Under repair, not bookable |
+| Status | Arti |
+|--------|------|
+| Available | Siap untuk dipesan |
+| Occupied | Sedang disewa |
+| Maintenance | Dalam perbaikan, tidak bisa dipesan |
 
-Click **"+ Tambah Unit"** to add new units.
+Klik **"+ Tambah Unit"** untuk menambah unit baru.
 
 ---
 
-## 4. Tenant Portal Features
+## 4. Fitur Portal Penyewa
 
-### 4.1 Tenant Dashboard
+### 4.1 Dashboard Penyewa
 
 **Path:** `/tenant/dashboard`
 
-After login, tenants see:
-- Assigned unit details
-- Current contract information
-- Outstanding invoices summary
-- Quick actions
+Setelah login, penyewa melihat:
+- Detail unit yang ditugaskan
+- Informasi kontrak saat ini
+- Ringkasan invoice yang belum lunas
+- Aksi cepat
 
-### 4.2 Invoice List
+### 4.2 Daftar Invoice
 
 **Path:** `/tenant/invoice`
 
-All invoices are listed with:
-- Period (billing month)
-- Total amount
-- Due date
-- Status badge (Unpaid/Overdue/Paid)
+Semua invoice tercantum dengan:
+- Periode (bulan tagihan)
+- Total jumlah
+- Tanggal jatuh tempo
+- Status (Belum Bayar/Jatuh Tempo/Lunas)
 
-### 4.3 Invoice Detail & Payment
+### 4.3 Detail Invoice & Pembayaran
 
 **Path:** `/tenant/invoice/[id]`
 
-For each invoice, tenants can:
+Untuk setiap invoice, penyewa dapat:
 
-1. **View Payment Breakdown**
-   - Rent amount
-   - Electric bill
-   - Water bill
-   - Other charges
-   - **Total amount due**
+1. **Lihat Rincian Pembayaran**
+   - Jumlah sewa
+   - Tagihan listrik
+   - Tagihan air
+   - Biaya lain
+   - **Total yang harus dibayar**
 
-2. **See Due Date Countdown**
-   - Shows days remaining until due
-   - Changes color as deadline approaches
+2. **Lihat Hitung Mundur Jatuh Tempo**
+   - Menampilkan hari tersisa sampai jatuh tempo
+   - Berubah warna seiring mendekati deadline
 
-3. **Upload Payment Proof**
-   - Tap to select photo (JPG/PNG, max 5MB)
-   - Choose payment method (Transfer/Cash/QRIS)
-   - Add optional notes
-   - Submit
+3. **Unggah Bukti Pembayaran**
+   - Ketuk untuk pilih foto (JPG/PNG, maks 5MB)
+   - Pilih metode pembayaran (Transfer/Tunai/QRIS)
+   - Tambahkan catatan opsional
+   - Kirim
 
-4. **Contact Property Manager**
-   - Phone number (clickable to call)
-   - Email (clickable to compose)
-   - Address
+4. **Hubungi Pengelola Properti**
+   - Nomor telepon (bisa diklik untuk menelepon)
+   - Email (bisa diklik untuk membuat pesan)
+   - Alamat
 
 ---
 
-## 5. Settings Configuration
+## 5. Konfigurasi Pengaturan
 
 **Path:** `/admin/settings`
 
-Settings are organized in three tabs:
+Pengaturan diatur dalam tiga tab:
 
-### 5.1 Informasi Properti (Property Information)
+### 5.1 Informasi Properti
 
-This tab configures your property's identity. Changes here affect:
-- Sidebar and headers
-- Email subject lines
-- Email footers
-- Public page content
+Tab ini mengkonfigurasi identitas properti Anda. Perubahan di sini memengaruhi:
+- Sidebar dan header
+- Subjek email
+- Footer email
+- Konten halaman publik
 
-| Field | Description | Where It Appears |
-|-------|-------------|------------------|
-| **Nama Properti** | Your property name | Sidebar, page titles, emails |
-| **Telepon** | Contact phone | Email footer, contact cards |
-| **Email** | Contact email | Reply-to address for all emails |
-| **Alamat** | Property address | Email footer, confirmation pages |
-| **Jam Operasional** | Business hours | Contact sections |
+| Field | Deskripsi | Muncul di Mana |
+|-------|------------|----------------|
+| **Nama Properti** | Nama properti Anda | Sidebar, judul halaman, email |
+| **Telepon** | Nomor kontak | Footer email, kartu kontak |
+| **Email** | Email kontak | Alamat balasan untuk semua email |
+| **Alamat** | Alamat properti | Footer email, halaman konfirmasi |
+| **Jam Operasional** | Jam kerja | Bagian kontak |
 
-### 5.2 Rekening Bank (Bank Accounts)
+### 5.2 Rekening Bank
 
-Configure bank transfer details shown in invoice emails:
-- Bank name
-- Account number
-- Account holder name
+Konfigurasi detail transfer bank yang ditampilkan di email invoice:
+- Nama bank
+- Nomor rekening
+- Nama pemilik rekening
 
-### 5.3 Aturan & Notifikasi (Rules & Notifications)
+### 5.3 Aturan & Notifikasi
 
-#### Booking Rules
-| Setting | Description |
-|---------|-------------|
-| Check-in Time | Default arrival time (e.g., 14:00) |
-| Check-out Time | Default departure time (e.g., 12:00) |
-| Minimum Stay | Minimum rental duration |
-| Maximum Advance Booking | How far ahead guests can book |
-| Deposit Percentage | Required deposit amount |
+#### Aturan Pemesanan
+| Pengaturan | Deskripsi |
+|-----------|------------|
+| Waktu Check-in | Waktu kedatangan default (misal: 14:00) |
+| Waktu Check-out | Waktu keberangkatan default (misal: 12:00) |
+| Minimum Sewa | Durasi sewa minimum |
+| Maksimum Pemesanan | Berapa jauh sebelumnya tamu bisa memesan |
+| Persentase Deposit | Jumlah deposit yang diperlukan |
 
-#### Invoice Rules
-| Setting | Description |
-|---------|-------------|
-| Due Date | Days after invoice generation |
-| Late Fee % | Penalty for overdue payments |
-| Reminder Days | When to send payment reminders |
+#### Aturan Invoice
+| Pengaturan | Deskripsi |
+|-----------|------------|
+| Jatuh Tempo | Hari setelah invoice dibuat |
+| Denda Terlambat % | Denda untuk pembayaran terlambat |
+| Hari Pengingat | Kapan mengirim pengingat pembayaran |
 
-#### Notification Settings
-| Setting | Description |
-|---------|-------------|
-| WhatsApp Owner | Phone number for owner notifications |
-| Email Owner | Email for vacancy reports |
-| Notify New Booking | Alert when new booking arrives |
-| Notify Payment | Alert when payment is received |
-| Notify Overdue | Alert for overdue invoices |
+#### Pengaturan Notifikasi
+| Pengaturan | Deskripsi |
+|-----------|------------|
+| WhatsApp Pemilik | Nomor telepon untuk notifikasi pemilik |
+| Email Pemilik | Email untuk laporan kekosongan |
+| Notif Pemesanan Baru | Alert saat pemesanan baru masuk |
+| Notif Pembayaran | Alert saat pembayaran masuk |
+| Notif Terlambat | Alert untuk invoice jatuh tempo |
 
-#### Testing Notifications
+#### Menguji Notifikasi
 
-Click the **"Test WhatsApp"** or **"Test Email"** buttons to verify your notification settings are configured correctly.
-
----
-
-## 6. Email Notifications
-
-The system sends automatic emails for various events:
-
-| Email Type | Trigger | Recipient |
-|------------|---------|-----------|
-| **Booking Received** | Guest submits booking | Owner (via WhatsApp) |
-| **Booking Confirmed** | Admin confirms booking | Guest |
-| **Booking Rejected** | Admin rejects booking | Guest |
-| **Invoice Created** | System generates invoice | Tenant |
-| **Payment Confirmed** | Admin confirms payment | Tenant |
-| **Payment Reminder** | Automatic (H-7, H-3) | Tenant |
-| **Tenant Account** | Tenant account created | Tenant |
-| **Vacancy Report** | Weekly summary | Owner |
-
-### Email Features
-
-- **Reply-to Address** — All replies go to your configured property email
-- **Property Footer** — Every email includes your contact information
-- **Bank Details** — Invoice emails include transfer instructions
+Klik tombol **"Test WhatsApp"** atau **"Test Email"** untuk memverifikasi pengaturan notifikasi Anda.
 
 ---
 
-## 7. WhatsApp Notifications
+## 6. Notifikasi Email
 
-WhatsApp messages are sent automatically for:
+Sistem mengirim email otomatis untuk berbagai acara:
 
-| Message Type | Recipient | Content |
-|--------------|-----------|---------|
-| New Booking | Owner | Guest details, dates |
-| Booking Confirmed | Guest | Confirmation details |
-| Booking Rejected | Guest | Cancellation notice |
-| Invoice Created | Tenant | Amount, due date |
-| Payment Confirmed | Tenant | Payment receipt |
-| Payment Reminder | Tenant | Past due warning |
-| Tenant Credentials | Tenant | Login info |
+| Tipe Email | Pemicu | Penerima |
+|------------|--------|----------|
+| **Pemesanan Diterima** | Tamu submit pemesanan | Pemilik (via WhatsApp) |
+| **Pemesanan Dikonfirmasi** | Admin konfirmasi pemesanan | Tamu |
+| **Pemesanan Ditolak** | Admin tolak pemesanan | Tamu |
+| **Invoice Dibuat** | Sistem generate invoice | Penyewa |
+| **Pembayaran Dikonfirmasi** | Admin konfirmasi pembayaran | Penyewa |
+| **Pengingat Pembayaran** | Otomatis (H-7, H-3) | Penyewa |
+| **Akun Tenant** | Akun tenant dibuat | Penyewa |
+| **Laporan Kekosongan** | Ringkasan mingguan | Pemilik |
 
-> **Note:** WhatsApp requires a valid phone number in international format (e.g., +6281234567890)
+### Fitur Email
+
+- **Alamat Reply-to** — Semua balasan masuk ke email properti Anda
+- **Footer Properti** — Setiap email menyertakan informasi kontak Anda
+- **Detail Bank** — Email invoice menyertakan instruksi transfer
 
 ---
 
-## 8. Demo Test Scenarios
+## 7. Notifikasi WhatsApp
 
-### Scenario 1: Complete Booking Flow
+Pesan WhatsApp dikirim otomatis untuk:
 
-Follow this end-to-end test to verify the entire system:
+| Tipe Pesan | Penerima | Konten |
+|------------|----------|--------|
+| Pemesanan Baru | Pemilik | Detail tamu, tanggal |
+| Pemesanan Dikonfirmasi | Tamu | Detail konfirmasi |
+| Pemesanan Ditolak | Tamu | Pemberitahuan pembatalan |
+| Invoice Dibuat | Penyewa | Jumlah, jatuh tempo |
+| Pembayaran Dikonfirmasi | Penyewa | Bukti pembayaran |
+| Pengingat Pembayaran | Penyewa | Peringatan terlambat |
+| Kredensial Tenant | Penyewa | Info login |
 
-**Step 1 — Guest Books a Room**
-1. Open the public page (`/kamar`)
-2. Select an available unit
-3. Fill in booking form:
-   - Full name
-   - Phone number
-   - Email address
-   - Check-in date
-   - Duration (months)
-   - Notes (optional)
-4. Submit booking
-5. Note the booking number shown
+> **Catatan:** WhatsApp memerlukan nomor telepon valid dalam format internasional (misal: +6281234567890)
 
-**Step 2 — Verify Owner Notification**
-1. Check your WhatsApp for "New Booking" notification
-2. Note guest details
+---
 
-**Step 3 — Admin Confirms Booking**
-1. Login to Admin Portal
-2. Go to `/admin/booking`
-3. Find the PENDING booking
-4. Click **"Konfirmasi"**
-5. Wait for success message
+## 8. Skenario Pengujian Demo
 
-**Step 4 — Verify Guest Notification**
-1. Check email for "Booking Confirmed" email
-2. Check WhatsApp for confirmation message
+### Skenario 1: Alur Pemesanan Lengkap
 
-**Step 5 — Create Tenant Account**
-1. In admin booking view, click **"Buat Tenant"**
-2. Set initial password
-3. Submit to create account
+Ikuti pengujian end-to-end ini untuk memverifikasi seluruh sistem:
 
-**Step 6 — Tenant Views Invoice**
-1. Login to Tenant Portal
-2. Go to `/tenant/invoice`
-3. Verify invoice is listed with correct amount
+**Langkah 1 — Tamu Memesan Kamar**
+1. Buka halaman publik (`/kamar`)
+2. Pilih unit yang tersedia
+3. Isi formulir pemesanan:
+   - Nama lengkap
+   - Nomor telepon
+   - Alamat email
+   - Tanggal check-in
+   - Durasi (bulan)
+   - Catatan (opsional)
+4. Submit pemesanan
+5. Catat nomor pemesanan yang ditampilkan
 
-**Step 7 — Tenant Uploads Payment**
-1. Click on invoice
-2. Click **"Bayar Sekarang"**
-3. Upload a photo (use any image)
-4. Select payment method
+**Langkah 2 — Verifikasi Notifikasi Pemilik**
+1. Periksa WhatsApp untuk notifikasi "Pemesanan Baru"
+2. Catat detail tamu
+
+**Langkah 3 — Admin Mengkonfirmasi Pemesanan**
+1. Login ke Portal Admin
+2. Buka `/admin/booking`
+3. Cari pemesanan berstatus PENDING
+4. Klik **"Konfirmasi"**
+5. Tunggu pesan sukses
+
+**Langkah 4 — Verifikasi Notifikasi Tamu**
+1. Periksa email untuk email "Pemesanan Dikonfirmasi"
+2. Periksa WhatsApp untuk pesan konfirmasi
+
+**Langkah 5 — Buat Akun Tenant**
+1. Di tampilan booking admin, klik **"Buat Tenant"**
+2. Set password awal
+3. Submit untuk membuat akun
+
+**Langkah 6 — Tenant Melihat Invoice**
+1. Login ke Portal Tenant
+2. Buka `/tenant/invoice`
+3. Verifikasi invoice tercantum dengan jumlah yang benar
+
+**Langkah 7 — Tenant Mengunggah Pembayaran**
+1. Klik invoice
+2. Klik **"Bayar Sekarang"**
+3. Unggah foto (gunakan gambar apapun)
+4. Pilih metode pembayaran
 5. Submit
 
-**Step 8 — Admin Confirms Payment**
-1. Login to Admin Portal
-2. Go to `/admin/invoice`
-3. Find UNPAID invoice
-4. Click to view details
-5. Verify payment proof image
-6. Click **"Konfirmasi Pembayaran"**
+**Langkah 8 — Admin Mengkonfirmasi Pembayaran**
+1. Login ke Portal Admin
+2. Buka `/admin/invoice`
+3. Cari invoice berstatus UNPAID
+4. Klik untuk melihat detail
+5. Verifikasi gambar bukti pembayaran
+6. Klik **"Konfirmasi Pembayaran"**
 
-**Step 9 — Verify Final Notification**
-1. Tenant receives payment confirmation email
-2. Invoice status shows as PAID
+**Langkah 9 — Verifikasi Notifikasi Akhir**
+1. Tenant menerima email konfirmasi pembayaran
+2. Status invoice menunjukkan PAID
 
-### Scenario 2: Property Settings Test
+### Skenario 2: Pengujian Pengaturan Properti
 
-Test that property information updates propagate correctly:
+Uji bahwa pembaruan informasi properti tersebar dengan benar:
 
-**Step 1 — Change Property Name**
-1. Go to `/admin/settings`
-2. Select **Informasi Properti** tab
-3. Change **Nama Properti** to something unique (e.g., "Pyta Test Property")
-4. Save
+**Langkah 1 — Ubah Nama Properti**
+1. Buka `/admin/settings`
+2. Pilih tab **Informasi Properti**
+3. Ubah **Nama Properti** ke sesuatu yang unik (misal: "Pyta Test Property")
+4. Simpan
 
-**Step 2 — Verify Changes**
-1. Check admin sidebar — name should update
-2. Check page title in browser tab
-3. Submit a test booking and check email subject line
+**Langkah 2 — Verifikasi Perubahan**
+1. Periksa sidebar admin — nama harus berubah
+2. Periksa judul halaman di tab browser
+3. Submit pemesanan tes dan periksa subjek email
 
-**Step 3 — Change Contact Info**
-1. Update phone and email
-2. Save
-3. Submit a test booking
-4. Check email footer — new contact info should appear
+**Langkah 3 — Ubah Info Kontak**
+1. Perbarui telepon dan email
+2. Simpan
+3. Submit pemesanan tes
+4. Periksa footer email — info kontak baru harus muncul
 
-**Step 4 — Test Notifications**
-1. Click **"Test Email"** button
-2. Verify email arrives with new property info in footer
-3. Click **"Test WhatsApp"** button
-4. Verify WhatsApp message is received
+**Langkah 4 — Uji Notifikasi**
+1. Klik tombol **"Test Email"**
+2. Verifikasi email masuk dengan info properti baru di footer
+3. Klik tombol **"Test WhatsApp"**
+4. Verifikasi pesan WhatsApp diterima
 
-**Step 5 — Reset to Original**
-1. Restore original property name
-2. Save
+**Langkah 5 — Kembalikan ke Original**
+1. Kembalikan nama properti asli
+2. Simpan
 
-### Scenario 3: Invoice Overdue Test
+### Skenario 3: Pengujian Invoice Terlambat
 
-Test the overdue detection system:
+Uji sistem deteksi keterlambatan:
 
-**Step 1 — Create Invoice Past Due Date**
-1. Set invoice due date to a past date in database
-2. Wait for cron job to run (or trigger manually)
+**Langkah 1 — Buat Invoice Lewat Jatuh Tempo**
+1. Set tanggal jatuh tempo invoice ke tanggal lalu di database
+2. Tunggu cron job berjalan (atau picu manual)
 
-**Step 2 — Verify Status Change**
-1. Invoice status changes from UNPAID to OVERDUE
-2. Visual indicator changes from yellow to red
+**Langkah 2 — Verifikasi Perubahan Status**
+1. Status invoice berubah dari UNPAID ke OVERDUE
+2. Indikator visual berubah dari kuning ke merah
 
-**Step 3 — Check Reminder**
-1. Cron job sends reminder notification
-2. Tenant receives WhatsApp/email reminder
-
----
-
-## 9. Troubleshooting
-
-### Email Not Received
-
-| Cause | Solution |
-|-------|----------|
-| Email in spam folder | Check spam/junk folder |
-| Wrong email address | Verify tenant email in settings |
-| Reply-to not configured | Set property email in Settings |
-| Email service down | Check Resend API dashboard |
-
-### WhatsApp Not Working
-
-| Cause | Solution |
-|-------|----------|
-| Wrong phone format | Use international format: +6281234567890 |
-| Phone not verified | Verify number in Fonnte dashboard |
-| API key invalid | Check WA_API_KEY in .env |
-
-### Booking Not Visible in Admin
-
-| Cause | Solution |
-|-------|----------|
-| Wrong status filter | Check all status columns in Kanban |
-| Booking was rejected | Check CANCELLED column |
-| Wrong property | Verify you are logged into correct account |
-
-### Invoice Not Created
-
-| Cause | Solution |
-|-------|----------|
-| Tenant not created | Must create tenant from confirmed booking |
-| Database error | Check server logs for Prisma errors |
-| Cron job not running | Verify cron endpoint is accessible |
-
-### Sidebar/Header Shows Wrong Name
-
-| Cause | Solution |
-|-------|----------|
-| Cache not cleared | Save settings again (cache auto-clears) |
-| Hardcoded value | Report as bug |
+**Langkah 3 — Periksa Pengingat**
+1. Cron job mengirim notifikasi pengingat
+2. Tenant menerima pengingat WhatsApp/email
 
 ---
 
-## 10. Quick Reference Card
+## 9. Pemecahan Masalah
 
-### Login Credentials
+### Email Tidak Diterima
 
-| Portal | URL | Credentials |
-|--------|-----|-------------|
+| Penyebab | Solusi |
+|----------|--------|
+| Email di folder spam | Periksa folder spam |
+| Alamat email salah | Verifikasi email tenant di pengaturan |
+| Reply-to belum dikonfigurasi | Set email properti di Settings |
+| Layanan email down | Periksa dashboard Resend API |
+
+### WhatsApp Tidak Berfungsi
+
+| Penyebab | Solusi |
+|----------|--------|
+| Format nomor salah | Gunakan format internasional: +6281234567890 |
+| Nomor belum diverifikasi | Verifikasi nomor di dashboard Fonnte |
+| API key tidak valid | Periksa WA_API_KEY di .env |
+
+### Pemesanan Tidak Muncul di Admin
+
+| Penyebab | Solusi |
+|----------|--------|
+| Filter status salah | Periksa semua kolom status di Kanban |
+| Pemesanan ditolak | Periksa kolom CANCELLED |
+| Properti salah | Verifikasi login dengan akun yang benar |
+
+### Invoice Tidak Dibuat
+
+| Penyebab | Solusi |
+|----------|--------|
+| Tenant belum dibuat | Harus buat tenant dari pemesanan yang dikonfirmasi |
+| Error database | Periksa log server untuk error Prisma |
+| Cron job tidak berjalan | Verifikasi endpoint cron bisa diakses |
+
+### Sidebar/Header Menampilkan Nama Salah
+
+| Penyebab | Solusi |
+|----------|--------|
+| Cache belum dihapus | Simpan pengaturan lagi (cache auto-clear) |
+| Nilai hardcoded | Laporkan sebagai bug |
+
+---
+
+## 10. Kartu Referensi Cepat
+
+### Kredensial Login
+
+| Portal | URL | Kredensial |
+|--------|-----|------------|
 | Admin | /admin/login | admin@grahamaju.com / admin123 |
-| Tenant | /tenant/login | Use demo buttons |
+| Tenant | /tenant/login | Gunakan tombol demo |
 
-### Key Pages
+### Halaman Utama
 
-| Feature | Admin Path | Tenant Path |
-|---------|------------|-------------|
+| Fitur | Path Admin | Path Tenant |
+|-------|------------|-------------|
 | Dashboard | /admin/dashboard | /tenant/dashboard |
-| Bookings | /admin/booking | — |
-| Tenants | /admin/tenant | — |
-| Invoices | /admin/invoice | /tenant/invoice |
-| Units | /admin/unit | — |
-| Settings | /admin/settings | — |
-| Rooms | /kamar | — |
+| Pemesanan | /admin/booking | — |
+| Tenant | /admin/tenant | — |
+| Invoice | /admin/invoice | /tenant/invoice |
+| Unit | /admin/unit | — |
+| Pengaturan | /admin/settings | — |
+| Kamar | /kamar | — |
 
-### Status Colors
+### Warna Status
 
 | Item | PENDING | CONFIRMED/ACTIVE | OVERDUE/CANCELLED | PAID/COMPLETED |
 |------|---------|------------------|-------------------|----------------|
-| Booking | Yellow | Blue | Red | Green |
-| Invoice | Yellow | — | Red | Green |
-| Unit | — | Green (Occupied) | Orange (Maintenance) | — |
+| Pemesanan | Kuning | Biru | Merah | Hijau |
+| Invoice | Kuning | — | Merah | Hijau |
+| Unit | — | Hijau (Dihuni) | Orange (Maintenance) | — |
 
 ---
 
-## Appendix: Cron Job Endpoints
+## Lampiran: Endpoint Cron Job
 
-For testing automation features:
+Untuk menguji fitur otomasi:
 
-| Endpoint | Purpose | Frequency |
-|----------|---------|-----------|
-| `/api/cron/invoice-reminder` | Send payment reminders | Daily |
-| `/api/cron/overdue-check` | Mark overdue invoices | Daily |
-| `/api/cron/vacancy-alert` | Weekly vacancy report | Weekly |
+| Endpoint | Tujuan | Frekuensi |
+|----------|--------|-----------|
+| `/api/cron/invoice-reminder` | Kirim pengingat pembayaran | Harian |
+| `/api/cron/overdue-check` | Tandai invoice jatuh tempo | Harian |
+| `/api/cron/vacancy-alert` | Laporan kekosongan mingguan | Mingguan |
 
-> These endpoints are typically called by external schedulers (Vercel Cron, GitHub Actions, etc.) but can be manually tested.
+> Endpoint ini biasanya dipanggil oleh scheduler eksternal (Vercel Cron, GitHub Actions, dll) tetapi bisa diuji manual.
 
 ---
 
-*End of User Guide*
+*Akhir Panduan Pengguna*
