@@ -8,12 +8,9 @@ async function getData() {
     const property = await prisma.property.findFirst({
       include: {
         units: {
-          where: {
-            status: { not: "MAINTENANCE" },
-          },
           orderBy: [
-            { status: "asc" }, // AVAILABLE first, then others
-            { pricePerMonth: "asc" },
+            { type: "asc" },
+            { unitNumber: "asc" },
           ],
         },
       },
@@ -35,7 +32,6 @@ async function getData() {
       facilities: u.facilities,
       photos: u.photos,
       description: u.description,
-      status: u.status,
     }));
 
     const cleanProperty = {

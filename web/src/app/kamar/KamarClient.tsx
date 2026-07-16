@@ -19,13 +19,11 @@ interface Unit {
   facilities: string[];
   photos: string[];
   description: string | null;
-  status: string;
   property: { name: string };
 }
 
 interface KamarClientProps {
   units: Unit[];
-  availableCount: number;
   propertyName?: string;
 }
 
@@ -36,26 +34,12 @@ const typeLabels: Record<string, string> = {
   VILLA: "Villa",
 };
 
-const statusLabels: Record<string, { label: string; class: string; textColor: string }> = {
-  AVAILABLE: { label: "Tersedia", class: "bg-green-600/90", textColor: "text-green-600" },
-  BOOKED: { label: "Dipesan", class: "bg-amber-500/90", textColor: "text-amber-600" },
-  OCCUPIED: { label: "Terisi", class: "bg-red-500/90", textColor: "text-red-600" },
-  MAINTENANCE: { label: "Perbaikan", class: "bg-gray-500/90", textColor: "text-gray-600" },
-};
-
 const typeFilters = [
   { key: "ALL", label: "Semua" },
   { key: "KOS_BULANAN", label: "Kos Bulanan" },
   { key: "KOS_HARIAN", label: "Kos Harian" },
   { key: "GUEST_HOUSE", label: "Guest House" },
   { key: "VILLA", label: "Villa" },
-];
-
-const statusFilters = [
-  { key: "ALL", label: "Semua" },
-  { key: "AVAILABLE", label: "Tersedia" },
-  { key: "BOOKED", label: "Dipesan" },
-  { key: "OCCUPIED", label: "Terisi" },
 ];
 
 function formatCurrency(amount: number): string {
@@ -67,37 +51,23 @@ function formatCurrency(amount: number): string {
 }
 
 function UnitCardGrid({ unit }: { unit: Unit }) {
-  const status = statusLabels[unit.status] || statusLabels.AVAILABLE;
-
   return (
     <Link
       href={`/kamar/${unit.slug}`}
-      className={cn(
-        "bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200",
-        unit.status !== "AVAILABLE" && "opacity-80"
-      )}
+      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200"
     >
       <div className="relative aspect-[4/3] bg-stone-200">
         {unit.photos && unit.photos.length > 0 ? (
           <img
             src={unit.photos[0]}
             alt={`Kamar ${unit.unitNumber}`}
-            className={cn(
-              "w-full h-full object-cover",
-              unit.status !== "AVAILABLE" && "grayscale-[30%]"
-            )}
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Home className="w-16 h-16 text-stone-400" />
           </div>
         )}
-        <span className={cn(
-          "absolute top-3 right-3 px-2 py-1 backdrop-blur-sm text-white text-xs font-medium rounded-full shadow-lg",
-          status.class
-        )}>
-          {status.label}
-        </span>
       </div>
 
       <div className="p-5">
@@ -148,37 +118,23 @@ function UnitCardGrid({ unit }: { unit: Unit }) {
 }
 
 function UnitCardList({ unit }: { unit: Unit }) {
-  const status = statusLabels[unit.status] || statusLabels.AVAILABLE;
-
   return (
     <Link
       href={`/kamar/${unit.slug}`}
-      className={cn(
-        "bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 flex",
-        unit.status !== "AVAILABLE" && "opacity-80"
-      )}
+      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 flex"
     >
       <div className="relative w-48 h-32 sm:h-auto sm:w-64 flex-shrink-0 bg-stone-200">
         {unit.photos && unit.photos.length > 0 ? (
           <img
             src={unit.photos[0]}
             alt={`Kamar ${unit.unitNumber}`}
-            className={cn(
-              "w-full h-full object-cover",
-              unit.status !== "AVAILABLE" && "grayscale-[30%]"
-            )}
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Home className="w-12 h-12 text-stone-400" />
           </div>
         )}
-        <span className={cn(
-          "absolute top-2 left-2 px-2 py-0.5 backdrop-blur-sm text-white text-xs font-medium rounded-full shadow",
-          status.class
-        )}>
-          {status.label}
-        </span>
       </div>
 
       <div className="flex-1 p-4 flex flex-col justify-between">
@@ -233,9 +189,8 @@ function UnitCardList({ unit }: { unit: Unit }) {
   );
 }
 
-export function KamarClient({ units, availableCount, propertyName = "Graha Maju" }: KamarClientProps) {
+export function KamarClient({ units, propertyName = "Graha Maju" }: KamarClientProps) {
   const [typeFilter, setTypeFilter] = useState("ALL");
-  const [statusFilter, setStatusFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
@@ -246,11 +201,6 @@ export function KamarClient({ units, availableCount, propertyName = "Graha Maju"
     // Type filter
     if (typeFilter !== "ALL") {
       filtered = filtered.filter((u) => u.type === typeFilter);
-    }
-
-    // Status filter
-    if (statusFilter !== "ALL") {
-      filtered = filtered.filter((u) => u.status === statusFilter);
     }
 
     // Search filter
@@ -265,9 +215,7 @@ export function KamarClient({ units, availableCount, propertyName = "Graha Maju"
     }
 
     return filtered;
-  }, [units, typeFilter, statusFilter, searchQuery]);
-
-  const filteredAvailableCount = filteredUnits.filter((u) => u.status === "AVAILABLE").length;
+  }, [units, typeFilter, searchQuery]);
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -292,14 +240,9 @@ export function KamarClient({ units, availableCount, propertyName = "Graha Maju"
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-stone-900">Kamar & Unit</h1>
           <p className="mt-2 text-stone-500">
-            {filteredAvailableCount > 0 ? (
-              <>
-                <span className="font-semibold text-green-600">{filteredAvailableCount}</span> kamar tersedia
-                {filteredUnits.length !== units.length && ` dari ${units.length} unit`}
-              </>
-            ) : (
-              `${filteredUnits.length} unit ditemukan`
-            )}
+            {filteredUnits.length === units.length
+              ? `${units.length} kamar tersedia`
+              : `${filteredUnits.length} dari ${units.length} kamar`}
           </p>
         </div>
 
@@ -366,7 +309,7 @@ export function KamarClient({ units, availableCount, propertyName = "Graha Maju"
           {/* Filter Chips */}
           <div className={cn("mt-4", !showFilters && "hidden sm:block")}>
             {/* Type Filters */}
-            <div className="mb-4">
+            <div>
               <p className="text-xs font-medium text-stone-500 mb-2">Tipe</p>
               <div className="flex flex-wrap gap-2">
                 {typeFilters.map((filter) => (
@@ -386,45 +329,11 @@ export function KamarClient({ units, availableCount, propertyName = "Graha Maju"
               </div>
             </div>
 
-            {/* Status Filters */}
-            <div>
-              <p className="text-xs font-medium text-stone-500 mb-2">Status</p>
-              <div className="flex flex-wrap gap-2">
-                {statusFilters.map((filter) => (
-                  <button
-                    key={filter.key}
-                    onClick={() => setStatusFilter(filter.key)}
-                    className={cn(
-                      "px-3 py-1.5 text-sm font-medium rounded-full transition-colors flex items-center gap-1.5",
-                      statusFilter === filter.key
-                        ? "bg-amber-500 text-white"
-                        : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-                    )}
-                  >
-                    {filter.key !== "ALL" && (
-                      <span
-                        className={cn(
-                          "w-2 h-2 rounded-full",
-                          filter.key === "AVAILABLE" && "bg-green-500",
-                          filter.key === "BOOKED" && "bg-amber-500",
-                          filter.key === "OCCUPIED" && "bg-red-500",
-                          filter.key === "MAINTENANCE" && "bg-gray-500",
-                          statusFilter === filter.key ? "bg-white/50" : ""
-                        )}
-                      />
-                    )}
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Clear Filters */}
-            {(typeFilter !== "ALL" || statusFilter !== "ALL" || searchQuery) && (
+            {(typeFilter !== "ALL" || searchQuery) && (
               <button
                 onClick={() => {
                   setTypeFilter("ALL");
-                  setStatusFilter("ALL");
                   setSearchQuery("");
                 }}
                 className="mt-4 text-sm text-amber-600 hover:text-amber-700 font-medium"

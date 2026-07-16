@@ -47,13 +47,6 @@ const typeLabels: Record<string, string> = {
   VILLA: "Villa",
 };
 
-const statusConfig: Record<string, { label: string; class: string }> = {
-  AVAILABLE: { label: "Tersedia", class: "bg-green-100 text-green-800" }, // Fixed: was green-700
-  BOOKED: { label: "Dipesan", class: "bg-amber-100 text-amber-800" },     // Fixed: was amber-700 (1.72:1 → 8.15:1)
-  OCCUPIED: { label: "Terisi", class: "bg-red-100 text-red-800" },         // Fixed: was red-700 (3.59:1 → 5.00:1)
-  MAINTENANCE: { label: "Perbaikan", class: "bg-gray-100 text-gray-700" },
-};
-
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -76,7 +69,6 @@ export default async function KamarDetailPage({
 
   const bookings = await getBookedDates(unit.id);
   const price = Number(unit.pricePerMonth || unit.pricePerNight || 0);
-  const status = statusConfig[unit.status] || statusConfig.AVAILABLE;
   const contactInfo = await getPropertyContactInfo();
 
   return (
@@ -111,16 +103,6 @@ export default async function KamarDetailPage({
               photos={unit.photos || []}
               unitNumber={unit.unitNumber}
             />
-
-            {/* Status Badge */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-stone-500">
-                {typeLabels[unit.type] || unit.type}
-              </span>
-              <span className={`px-3 py-1 text-sm font-medium rounded-full ${status.class}`}>
-                {status.label}
-              </span>
-            </div>
 
             {/* Unit Title */}
             <div>
@@ -165,32 +147,7 @@ export default async function KamarDetailPage({
 
           {/* Right Column - Booking Form */}
           <div className="lg:col-span-2">
-            {unit.status !== "AVAILABLE" ? (
-              <div className="bg-stone-100 rounded-xl p-8 text-center">
-                <div className="w-16 h-16 bg-stone-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Home className="w-8 h-8 text-stone-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-stone-700 mb-2">
-                  Unit Tidak Tersedia
-                </h3>
-                <p className="text-stone-500 mb-4">
-                  {unit.status === "MAINTENANCE"
-                    ? "Unit ini sedang dalam perbaikan dan tidak dapat dipesan."
-                    : unit.status === "OCCUPIED"
-                    ? "Unit ini sedang berpenghuni."
-                    : unit.status === "BOOKED"
-                    ? "Unit ini sedang dalam proses pemesanan."
-                    : "Unit ini tidak tersedia untuk saat ini."}
-                </p>
-                <Link
-                  href="/kamar"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-stone-200 text-stone-700 rounded-lg hover:bg-stone-300 transition-colors"
-                >
-                  Lihat Kamar Lainnya
-                </Link>
-              </div>
-            ) : (
-              <BookingForm
+            <BookingForm
                 unit={{
                   id: unit.id,
                   slug: unit.slug,
@@ -215,7 +172,6 @@ export default async function KamarDetailPage({
                   durationNights: b.durationNights ?? undefined,
                 }))}
               />
-            )}
           </div>
         </div>
       </div>

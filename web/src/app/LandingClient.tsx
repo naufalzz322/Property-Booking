@@ -47,23 +47,10 @@ function RoomCard({ unit }: { unit: any }) {
   const price = unit.pricePerMonth || unit.pricePerNight || 0;
   const priceUnit = getPriceUnit(unit.type);
 
-  // Status badge configuration
-  const statusConfig: Record<string, { label: string; bg: string; text: string; icon?: string }> = {
-    AVAILABLE: { label: "Tersedia", bg: "bg-green-600/90", text: "text-white" },
-    OCCUPIED: { label: "Ditempati", bg: "bg-blue-600/90", text: "text-white" },
-    BOOKED: { label: "Dipesan", bg: "bg-amber-600/90", text: "text-white" },
-    MAINTENANCE: { label: "Perbaikan", bg: "bg-red-600/90", text: "text-white" },
-  };
-
-  const status = statusConfig[unit.status] || statusConfig.AVAILABLE;
-  const isAvailable = unit.status === "AVAILABLE";
-
   return (
     <Link
       href={`/kamar/${unit.slug}`}
-      className={`bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow ${
-        !isAvailable ? "opacity-75" : ""
-      }`}
+      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow"
     >
       <div className="relative aspect-[4/3] bg-stone-200">
         {unit.photos && unit.photos.length > 0 ? (
@@ -71,16 +58,13 @@ function RoomCard({ unit }: { unit: any }) {
           <img
             src={unit.photos[0]}
             alt={unit.name}
-            className={`w-full h-full object-cover ${!isAvailable ? "grayscale-[30%]" : ""}`}
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <HomeIcon className="w-16 h-16 text-stone-400" />
           </div>
         )}
-        <span className={`absolute top-3 right-3 px-2 py-1 ${status.bg} ${status.text} text-xs font-medium rounded-full shadow-lg`}>
-          {status.label}
-        </span>
       </div>
       <div className="p-6">
         <div className="flex items-center justify-between">
@@ -129,7 +113,6 @@ interface Unit {
   facilities: string[];
   photos: string[];
   description: string | null;
-  status: string;
 }
 
 interface Property {
@@ -302,7 +285,7 @@ export default function LandingPage({ property, allUnits }: { property: Property
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-stone-900">Kamar & Unit</h2>
             <p className="mt-2 text-stone-500">
-              {allUnits.filter(u => u.status === "AVAILABLE").length} kamar tersedia dari {allUnits.length} total unit
+              {allUnits.length} kamar tersedia
             </p>
           </div>
 
