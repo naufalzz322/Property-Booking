@@ -64,7 +64,8 @@ export async function POST(
   const unitDisplayName = booking.unit.name || booking.unit.property.name;
 
   // Send Wa notification to guest
-  const waMessage = `Booking Dikonfirmasi
+  try {
+    const waMessage = `Booking Dikonfirmasi
 
 Halo ${booking.guestName},
 
@@ -79,23 +80,31 @@ Kamu akan menerima akun tenant setelah konfirmasi check-in.
 
 Sampai jumpa!`;
 
-  await sendWANotification(booking.guestPhone, waMessage);
+    await sendWANotification(booking.guestPhone, waMessage);
+  } catch (waError) {
+    console.error(`[Confirm Booking] Failed to send WA to ${booking.guestPhone}:`, waError);
+  }
 
   // Send email notification
-  const ownerPhone = await getOwnerPhone();
-  const replyTo = await getPropertyEmail();
+  try {
+    const ownerPhone = await getOwnerPhone();
+    const replyTo = await getPropertyEmail();
 
-  await sendBookingConfirmationEmail({
-    guestEmail: booking.guestEmail,
-    guestName: booking.guestName,
-    bookingNumber: booking.bookingNumber,
-    unitNumber: booking.unit.unitNumber,
-    propertyName: unitDisplayName,
-    checkInDate: checkInDateFormatted,
-    duration: booking.durationMonths || booking.durationNights || 1,
-    ownerPhone,
-    replyTo,
-  });
+    await sendBookingConfirmationEmail({
+      guestEmail: booking.guestEmail,
+      guestName: booking.guestName,
+      bookingNumber: booking.bookingNumber,
+      unitNumber: booking.unit.unitNumber,
+      propertyName: unitDisplayName,
+      checkInDate: checkInDateFormatted,
+      duration: booking.durationMonths || booking.durationNights || 1,
+      durationType: booking.durationMonths ? "bulan" : "malam",
+      ownerPhone,
+      replyTo,
+    });
+  } catch (emailError) {
+    console.error(`[Confirm Booking] Failed to send email to ${booking.guestEmail}:`, emailError);
+  }
 
   return NextResponse.json({
     success: true,

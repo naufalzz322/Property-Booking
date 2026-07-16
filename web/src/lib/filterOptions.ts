@@ -14,6 +14,7 @@ export const INVOICE_STATUS_OPTIONS = [
   { value: "UNPAID", label: "Belum Bayar" },
   { value: "PAID", label: "Lunas" },
   { value: "OVERDUE", label: "Overdue" },
+  { value: "WAIVED", label: "Dibebaskan" },
 ] as const;
 
 export const TENANT_STATUS_OPTIONS = [
@@ -37,6 +38,7 @@ export const INVOICE_STATUS_LABELS: Record<string, string> = {
   UNPAID: "Belum Bayar",
   PAID: "Lunas",
   OVERDUE: "Overdue",
+  WAIVED: "Dibebaskan",
 };
 
 export function getInvoiceStatusLabel(status: string): string {

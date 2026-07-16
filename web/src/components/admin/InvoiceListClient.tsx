@@ -61,12 +61,14 @@ const statusColors: Record<string, string> = {
   UNPAID: "bg-amber-100 text-amber-800",
   PAID: "bg-emerald-100 text-emerald-800",
   OVERDUE: "bg-red-100 text-red-800",
+  WAIVED: "bg-slate-100 text-slate-700",
 };
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   PAID: { label: "Lunas", color: "text-emerald-600", icon: CheckCircle },
   UNPAID: { label: "Belum Bayar", color: "text-amber-600", icon: Clock },
   OVERDUE: { label: "Overdue", color: "text-red-600", icon: AlertTriangle },
+  WAIVED: { label: "Dibebaskan", color: "text-slate-600", icon: Clock },
 };
 
 function formatCurrency(amount: number): string {

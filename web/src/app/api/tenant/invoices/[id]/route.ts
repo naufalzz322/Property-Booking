@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { tenantAuthOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +10,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(tenantAuthOptions);
+    const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Verify this is a tenant session (not admin)
+    const userRole = (session.user as any).role;
+    if (userRole === "ADMIN" || userRole === "OWNER") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

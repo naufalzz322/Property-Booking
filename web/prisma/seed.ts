@@ -409,7 +409,7 @@ async function main() {
   const checkedInTenants = [
     { name: "Rizky Ramadhan", email: "rizky.ramadhan@email.com", phone: "081987654321", bookingSeq: 10, unitNumber: "KOS-101", contractStart: monthsAgo(3, 1), contractEnd: monthsFromNow(9, 1) },
     { name: "Putri Wulandari", email: "putri.wulandari@email.com", phone: "082123456789", bookingSeq: 11, unitNumber: "KOS-102", contractStart: monthsAgo(2, 1), contractEnd: monthsFromNow(4, 1) },
-    { name: "Galang Ramadhan", email: "galang.ramadhan@email.com", phone: "088765432109", bookingSeq: 12, unitNumber: "KDH-04", contractStart: daysAgo(3), contractEnd: daysAgo(0) }, // ends today
+    { name: "Galang Ramadhan", email: "galang.ramadhan@email.com", phone: "088765432109", bookingSeq: 12, unitNumber: "KDH-04", contractStart: daysAgo(3), contractEnd: daysFromNow(1) }, // ends tomorrow for demo
   ];
 
   const allTenantsData = [...waitingPaymentTenants, ...paidTenants, ...checkedInTenants];
@@ -867,7 +867,7 @@ async function main() {
     // Kontrak Akan Berakhir
     {
       title: "Kontrak Akan Berakhir",
-      message: "Kontrak Galang Ramadhan (KDH-04) akan berakhir hari ini.",
+      message: "Kontrak Galang Ramadhan (KDH-04) akan berakhir besok.",
       type: NotificationType.CONTRACT_EXPIRING,
       entityId: getTenantId("galang.ramadhan@email.com"),
       entityType: "Tenant",
@@ -949,10 +949,10 @@ async function main() {
       isRead: false,
     },
 
-    // Galang Ramadhan (CHECKED_IN) - contract expiring today
+    // Galang Ramadhan (CHECKED_IN) - contract expiring tomorrow
     {
       title: "Kontrak Akan Berakhir",
-      message: "Kontrak Anda akan berakhir hari ini. Hubungi admin untuk perpanjangan atau check-out.",
+      message: "Kontrak Anda akan berakhir besok. Hubungi admin untuk perpanjangan atau check-out.",
       type: NotificationType.CONTRACT_EXPIRING_TENANT,
       entityId: getTenantId("galang.ramadhan@email.com"),
       entityType: "Tenant",

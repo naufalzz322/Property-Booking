@@ -163,6 +163,7 @@ enum InvoiceStatus {
   UNPAID
   PAID
   OVERDUE
+  WAIVED
 }
 
 model Notification {

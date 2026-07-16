@@ -7,6 +7,32 @@ import { getOwnerPhone, getPropertyName, getPropertyEmail } from "@/lib/property
 import { format, subMonths } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
+// Ensure PropertySettings exists with defaults
+async function ensurePropertySettings() {
+  const existing = await prisma.propertySettings.findFirst();
+  if (!existing) {
+    await prisma.propertySettings.create({
+      data: {
+        defaultCheckInTime: "14:00",
+        defaultCheckOutTime: "12:00",
+        minimumStayNights: 1,
+        maximumAdvanceBooking: 90,
+        depositPercentage: 100,
+        defaultDueDateDays: 7,
+        lateFeePercentage: 2,
+        whatsappOwner: process.env.OWNER_PHONE || "6281234567890",
+        emailOwner: process.env.OWNER_EMAIL || "owner@example.com",
+        notifyNewBooking: true,
+        notifyPaymentReceived: true,
+        notifyOverdue: true,
+        notifyVacancyReport: true,
+        reminderDays: "1,3,7",
+      },
+    });
+    console.log("[Invoice Generation] PropertySettings created with defaults");
+  }
+}
+
 export async function GET(req: Request) {
   // Verify cron secret
   const authHeader = req.headers.get("authorization");
@@ -15,6 +41,9 @@ export async function GET(req: Request) {
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Ensure PropertySettings exists
+  await ensurePropertySettings();
 
   // Determine the period to invoice (previous month by default)
   const url = new URL(req.url);

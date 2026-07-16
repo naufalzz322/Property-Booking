@@ -55,6 +55,13 @@ const statusConfig: Record<string, {
     icon: AlertTriangle,
     badgeBg: "bg-white/30",
   },
+  WAIVED: {
+    label: "DIBEBANKAN",
+    sublabel: "Tagihan dibebaskan",
+    gradient: "from-gray-500 to-gray-600",
+    icon: Clock,
+    badgeBg: "bg-white/20",
+  },
 };
 
 export function InvoiceStatusHeader({
@@ -67,6 +74,7 @@ export function InvoiceStatusHeader({
   const config = statusConfig[status] || statusConfig.UNPAID;
   const StatusIcon = config.icon;
   const isPaid = status === "PAID";
+  const isWaived = status === "WAIVED";
 
   // Calculate days
   const today = new Date();
@@ -99,7 +107,7 @@ export function InvoiceStatusHeader({
 
       <div className={cn(
         "flex items-center justify-center gap-2 pt-4 border-t border-white/20",
-        isPaid ? "border-emerald-400/30" : status === "OVERDUE" ? "border-red-400/30" : "border-amber-400/30"
+        isPaid ? "border-emerald-400/30" : status === "OVERDUE" ? "border-red-400/30" : isWaived ? "border-gray-400/30" : "border-amber-400/30"
       )}>
         <Clock className="w-4 h-4 opacity-80" />
         <span className="text-sm opacity-80">

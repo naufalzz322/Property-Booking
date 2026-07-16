@@ -35,15 +35,22 @@ export async function isUnitAvailable(
     if (booking.durationMonths) {
       existingEnd = addMonths(existingStart, booking.durationMonths);
     } else if (booking.durationNights) {
-      existingEnd = addDays(existingStart, booking.durationNights);
+      existingEnd = addDays(checkIn, booking.durationNights); // Use checkIn as base for night calculations
     } else {
       return false;
     }
 
+    // Use consistent exclusive end check for both existing and new booking
+    // Check-in day is inclusive, check-out day is exclusive (guest leaves on check-out day)
+    const newEnd = checkOut;
+
     return (
+      // New check-in overlaps existing booking
       (checkIn >= existingStart && checkIn < existingEnd) ||
-      (checkOut > existingStart && checkOut <= existingEnd) ||
-      (checkIn <= existingStart && checkOut >= existingEnd)
+      // New check-out overlaps existing booking
+      (newEnd > existingStart && newEnd <= existingEnd) ||
+      // New booking completely contains existing booking
+      (checkIn <= existingStart && newEnd >= existingEnd)
     );
   });
 

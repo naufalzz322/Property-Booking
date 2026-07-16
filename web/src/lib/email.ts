@@ -228,6 +228,7 @@ export async function sendBookingConfirmationEmail({
   unitName,
   checkInDate,
   duration,
+  durationType,
   ownerPhone,
   replyTo,
 }: {
@@ -239,10 +240,12 @@ export async function sendBookingConfirmationEmail({
   unitName?: string;
   checkInDate: string;
   duration: number;
+  durationType?: "bulan" | "malam";
   ownerPhone?: string | null;
   replyTo?: string | null;
 }) {
   const displayUnit = unitName ? `${unitName} - Unit ${unitNumber}` : `Unit ${unitNumber}`;
+  const displayDuration = durationType === "malam" ? `${duration} malam` : `${duration} bulan`;
   const displayPhone = ownerPhone || process.env.OWNER_PHONE || "Hubungi kami";
   const html = `
 <!DOCTYPE html>
@@ -278,7 +281,7 @@ export async function sendBookingConfirmationEmail({
         </tr>
         <tr>
           <td style="padding: 8px 0; color: #6b7280;">Durasi</td>
-          <td style="padding: 8px 0; font-weight: 600; text-align: right;">${duration} bulan</td>
+          <td style="padding: 8px 0; font-weight: 600; text-align: right;">${displayDuration}</td>
         </tr>
       </table>
     </div>
