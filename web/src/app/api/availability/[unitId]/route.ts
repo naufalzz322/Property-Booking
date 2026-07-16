@@ -41,7 +41,8 @@ export async function GET(
     },
   });
 
-  // Generate booked dates
+  // Generate booked dates (including checkout day - next-day policy)
+  // Guest checks out in the morning, room is cleaned/prepared for next guest
   const bookedDates: Array<{
     date: string;
     status: "booked" | "checked_in";
@@ -60,9 +61,13 @@ export async function GET(
       continue;
     }
 
+    // Next-day policy: include checkout day as blocked
+    // Room is being prepared for the next guest
+    const effectiveEnd = addDays(checkOut, 1);
+
     // Only include dates within the target month
     const start = checkIn < startOfTargetMonth ? startOfTargetMonth : checkIn;
-    const end = checkOut > endOfTargetMonth ? endOfTargetMonth : checkOut;
+    const end = effectiveEnd > endOfTargetMonth ? endOfTargetMonth : effectiveEnd;
 
     let current = new Date(start);
     while (current <= end) {

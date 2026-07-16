@@ -35,18 +35,18 @@ export async function isUnitAvailable(
     if (booking.durationMonths) {
       existingEnd = addMonths(existingStart, booking.durationMonths);
     } else if (booking.durationNights) {
-      existingEnd = addDays(checkIn, booking.durationNights); // Use checkIn as base for night calculations
+      existingEnd = addDays(existingStart, booking.durationNights);
     } else {
       return false;
     }
 
-    // Use consistent exclusive end check for both existing and new booking
-    // Check-in day is inclusive, check-out day is exclusive (guest leaves on check-out day)
+    // Next-day policy: minimum 1 day gap between bookings
+    // Checkout day is blocked for new check-ins (room being cleaned/prepared)
     const newEnd = checkOut;
 
     return (
-      // New check-in overlaps existing booking
-      (checkIn >= existingStart && checkIn < existingEnd) ||
+      // New check-in overlaps existing booking (including checkout day)
+      (checkIn >= existingStart && checkIn <= existingEnd) ||
       // New check-out overlaps existing booking
       (newEnd > existingStart && newEnd <= existingEnd) ||
       // New booking completely contains existing booking
@@ -90,9 +90,14 @@ export async function getBookedDates(
       continue;
     }
 
-    let current = new Date(Math.max(checkIn.getTime(), startOfMonth.getTime()));
-    const end = new Date(Math.min(checkOut.getTime(), endOfMonth.getTime()));
+    // Next-day policy: include checkout day as blocked
+    // Room is being prepared for the next guest
+    const effectiveEnd = addDays(checkOut, 1);
 
+    let current = new Date(Math.max(checkIn.getTime(), startOfMonth.getTime()));
+    const end = new Date(Math.min(effectiveEnd.getTime(), endOfMonth.getTime()));
+
+    // Next-day policy: include checkout day as blocked (room being prepared)
     while (current <= end) {
       bookedDates.push({
         date: format(current, "yyyy-MM-dd"),
