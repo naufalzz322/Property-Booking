@@ -32,7 +32,7 @@ Panduan ini dirancang untuk:
 
 ### Portal Admin
 
-**URL:** `http://localhost:3000/admin/login`
+**URL:** `https://property-booking-three.vercel.app/admin/login`
 
 | Peran | Email | Kata Sandi |
 |-------|-------|------------|
@@ -41,7 +41,7 @@ Panduan ini dirancang untuk:
 
 ### Portal Penyewa
 
-**URL:** `http://localhost:3000/tenant/login`
+**URL:** `https://property-booking-three.vercel.app/admin/login`
 
 Akun demo penyewa sudah terisi di halaman login untuk memudahkan pengujian.
 
