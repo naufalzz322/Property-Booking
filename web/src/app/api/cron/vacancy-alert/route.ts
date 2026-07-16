@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendWANotification } from "@/lib/wa";
-import { getOwnerPhone, getOwnerEmail, getPropertyName, getNotificationSettings, getPropertyEmail } from "@/lib/property";
+import { getOwnerPhone, getPropertyName, getNotificationSettings, getPropertyEmail } from "@/lib/property";
 import { sendVacancyReportEmail } from "@/lib/email";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
 export async function GET(req: Request) {
@@ -16,37 +16,72 @@ export async function GET(req: Request) {
   }
 
   const ownerPhone = await getOwnerPhone();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  // Get available units
+  // Get available units with their next upcoming booking
   const availableUnits = await prisma.unit.findMany({
     where: { status: "AVAILABLE" },
-    include: { property: true },
+    include: {
+      property: true,
+      bookings: {
+        where: {
+          status: { in: ["CONFIRMED", "CHECKED_IN"] },
+          checkInDate: { gte: today },
+        },
+        orderBy: { checkInDate: "asc" },
+        take: 1,
+      },
+    },
   });
 
+  // Categorize units: truly vacant vs coming soon
+  const trulyVacant = availableUnits.filter((u) => u.bookings.length === 0);
+  const comingVacant = availableUnits.filter((u) => u.bookings.length > 0);
+
   // Get tenants with expiring contracts (within 30 days)
-  const thirtyDaysFromNow = new Date();
-  thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+  const thirtyDaysFromNow = addDays(today, 30);
 
   const expiringTenants = await prisma.tenant.findMany({
     where: {
       isActive: true,
       contractEnd: {
-        gte: new Date(),
+        gte: today,
         lte: thirtyDaysFromNow,
       },
     },
     include: { unit: { include: { property: true } } },
   });
 
-  // Create notifications for vacant units
+  // Create notifications for truly vacant units (not occupied, no upcoming booking)
   let notificationsCreated = 0;
-  for (const unit of availableUnits) {
+  for (const unit of trulyVacant) {
     await prisma.notification.create({
       data: {
         recipient: "ADMIN",
         type: "UNIT_MAINTENANCE",
         title: "Unit Kosong",
-        message: `Unit ${unit.unitNumber} kosong dan belum disewakan`,
+        message: `Unit ${unit.unitNumber} kosong dan siap disewakan`,
+        entityId: unit.id,
+        entityType: "UNIT",
+      },
+    });
+    notificationsCreated++;
+  }
+
+  // Create notifications for units with upcoming bookings
+  for (const unit of comingVacant) {
+    const nextBooking = unit.bookings[0];
+    const daysUntil = Math.ceil(
+      (new Date(nextBooking.checkInDate).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    await prisma.notification.create({
+      data: {
+        recipient: "ADMIN",
+        type: "UNIT_MAINTENANCE",
+        title: "Unit Akan Terisi",
+        message: `Unit ${unit.unitNumber} akan terisi ${daysUntil} hari lagi (${format(nextBooking.checkInDate, "dd MMM", { locale: idLocale })})`,
         entityId: unit.id,
         entityType: "UNIT",
       },
@@ -102,15 +137,32 @@ Terima kasih.`;
 
   let emailSent = 0;
 
-  // Send summary to owner
+  // Send summary to owner via WhatsApp
   if (ownerPhone && (availableUnits.length > 0 || expiringTenants.length > 0)) {
+    const trulyVacantList = trulyVacant
+      .map((u) => `- ${u.name || u.property.name} - Unit ${u.unitNumber}`)
+      .join("\n") || "(tidak ada)";
+
+    const comingVacantList = comingVacant
+      .map((u) => {
+        const nextBooking = u.bookings[0];
+        const nextDate = format(nextBooking.checkInDate, "dd MMM", { locale: idLocale });
+        return `- ${u.name || u.property.name} - Unit ${u.unitNumber} (booking: ${nextDate})`;
+      })
+      .join("\n") || "(tidak ada)";
+
     const message = `Laporan Mingguan
 
-${availableUnits.length} unit kosong:
-${availableUnits.map((u) => `- ${u.name || u.property.name} - Unit ${u.unitNumber}`).join("\n")}
+📋 ${trulyVacant.length} Unit Kosong (Siap Sewa):
+${trulyVacantList}
 
-${expiringTenants.length} kontrak akan habis:
-${expiringTenants.map((t) => `- ${t.name} - Unit ${t.unit.unitNumber} (${t.unit.name || t.unit.property.name})`).join("\n")}`;
+📅 ${comingVacant.length} Unit Akan Terisi:
+${comingVacantList}
+
+⚠️ ${expiringTenants.length} kontrak akan habis:
+${expiringTenants
+  .map((t) => `- ${t.name} - Unit ${t.unit.unitNumber}`)
+  .join("\n") || "(tidak ada)"}`;
 
     await sendWANotification(ownerPhone, message);
   }
@@ -120,11 +172,24 @@ ${expiringTenants.map((t) => `- ${t.name} - Unit ${t.unit.unitNumber} (${t.unit.
   if (notifySettings.notifyVacancyReport && notifySettings.emailOwner) {
     const propertyName = await getPropertyName();
 
-    const vacantUnitsData = availableUnits.map((u) => ({
+    const trulyVacantData = trulyVacant.map((u) => ({
       unitNumber: u.unitNumber,
       unitName: u.name || u.property.name,
       type: u.type,
+      status: "ready" as const,
+      nextCheckIn: null,
     }));
+
+    const comingVacantData = comingVacant.map((u) => {
+      const nextBooking = u.bookings[0];
+      return {
+        unitNumber: u.unitNumber,
+        unitName: u.name || u.property.name,
+        type: u.type,
+        status: "upcoming" as const,
+        nextCheckIn: format(nextBooking.checkInDate, "dd MMM yyyy", { locale: idLocale }),
+      };
+    });
 
     const expiringContractsData = expiringTenants.map((t) => ({
       tenantName: t.name,
@@ -138,7 +203,7 @@ ${expiringTenants.map((t) => `- ${t.name} - Unit ${t.unit.unitNumber} (${t.unit.
       await sendVacancyReportEmail({
         ownerEmail: notifySettings.emailOwner,
         propertyName,
-        vacantUnits: vacantUnitsData,
+        vacantUnits: [...trulyVacantData, ...comingVacantData],
         expiringContracts: expiringContractsData,
         replyTo,
       });
@@ -150,6 +215,11 @@ ${expiringTenants.map((t) => `- ${t.name} - Unit ${t.unit.unitNumber} (${t.unit.
   }
 
   return NextResponse.json({
+    summary: {
+      trulyVacant: trulyVacant.length,
+      comingVacant: comingVacant.length,
+      expiringContracts: expiringTenants.length,
+    },
     vacantUnits: availableUnits.length,
     expiringContracts: expiringTenants.length,
     notificationsCreated,

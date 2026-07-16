@@ -804,29 +804,58 @@ export async function sendVacancyReportEmail({
   ownerEmail: string;
   ownerName?: string;
   propertyName: string;
-  vacantUnits: Array<{ unitNumber: string; unitName: string; type: string }>;
+  vacantUnits: Array<{
+    unitNumber: string;
+    unitName: string;
+    type: string;
+    status: "ready" | "upcoming";
+    nextCheckIn: string | null;
+  }>;
   expiringContracts: Array<{ tenantName: string; unitNumber: string; unitName: string; endDate: string }>;
   replyTo?: string | null;
 }) {
   const greeting = ownerName ? `Halo ${ownerName}` : "Halo Owner";
   const today = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 
-  const vacantUnitsHtml = vacantUnits.length > 0
+  // Separate truly vacant and upcoming
+  const trulyVacant = vacantUnits.filter(u => u.status === "ready");
+  const comingVacant = vacantUnits.filter(u => u.status === "upcoming");
+
+  const trulyVacantHtml = trulyVacant.length > 0
+    ? `<table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+        <tr style="background: #d1fae5;">
+          <th style="padding: 10px; text-align: left; border-bottom: 1px solid #6ee7b7;">Unit</th>
+          <th style="padding: 10px; text-align: left; border-bottom: 1px solid #6ee7b7;">Nama</th>
+          <th style="padding: 10px; text-align: left; border-bottom: 1px solid #6ee7b7;">Status</th>
+        </tr>
+        ${trulyVacant.map(u => `
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6;">${u.unitNumber}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6;">${u.unitName}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6;"><span style="background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Siap Sewa</span></td>
+          </tr>
+        `).join("")}
+      </table>`
+    : "<p style='color: #64748b; font-size: 13px;'>Tidak ada unit kosong</p>";
+
+  const comingVacantHtml = comingVacant.length > 0
     ? `<table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
         <tr style="background: #fef3c7;">
           <th style="padding: 10px; text-align: left; border-bottom: 1px solid #fcd34d;">Unit</th>
           <th style="padding: 10px; text-align: left; border-bottom: 1px solid #fcd34d;">Nama</th>
-          <th style="padding: 10px; text-align: left; border-bottom: 1px solid #fcd34d;">Tipe</th>
+          <th style="padding: 10px; text-align: left; border-bottom: 1px solid #fcd34d;">Booking Berikutnya</th>
         </tr>
-        ${vacantUnits.map(u => `
+        ${comingVacant.map(u => `
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #f3f4f6;">${u.unitNumber}</td>
             <td style="padding: 10px; border-bottom: 1px solid #f3f4f6;">${u.unitName}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6;">${u.type}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6;"><span style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${u.nextCheckIn}</span></td>
           </tr>
         `).join("")}
       </table>`
-    : "<p style='color: #64748b;'>Tidak ada unit kosong</p>";
+    : "";
+
+  const vacantUnitsHtml = trulyVacantHtml + comingVacantHtml;
 
   const expiringContractsHtml = expiringContracts.length > 0
     ? `<table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
@@ -870,16 +899,29 @@ export async function sendVacancyReportEmail({
         Berikut laporan properti Anda untuk minggu ini.
       </p>
 
-      <!-- Vacant Units -->
+      <!-- Truly Vacant Units -->
+      <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; padding: 24px; margin: 24px 0;">
+        <h3 style="margin: 0 0 8px; color: #166534; font-size: 16px; font-weight: 600;">
+          ✅ Unit Kosong - Siap Sewa (${trulyVacant.length})
+        </h3>
+        <p style="margin: 0 0 12px; color: #15803d; font-size: 13px;">
+          Unit yang tersedia sekarang dan siap disewakan
+        </p>
+        ${trulyVacantHtml}
+      </div>
+
+      <!-- Coming Vacant Units -->
+      ${comingVacant.length > 0 ? `
       <div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 24px; margin: 24px 0;">
         <h3 style="margin: 0 0 8px; color: #92400e; font-size: 16px; font-weight: 600;">
-          🏠 Unit Kosong (${vacantUnits.length})
+          📅 Unit Akan Terisi (${comingVacant.length})
         </h3>
         <p style="margin: 0 0 12px; color: #a16207; font-size: 13px;">
-          Unit yang belum disewakan
+          Unit kosong sekarang tapi ada booking yang akan datang
         </p>
-        ${vacantUnitsHtml}
+        ${comingVacantHtml}
       </div>
+      ` : ""}
 
       <!-- Expiring Contracts -->
       <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 12px; padding: 24px; margin: 24px 0;">
