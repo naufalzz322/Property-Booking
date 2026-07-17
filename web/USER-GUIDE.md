@@ -32,7 +32,7 @@ Panduan ini dirancang untuk:
 
 ### Portal Admin
 
-**URL:** [Link Admin Login Page](https://property-booking-three.vercel.app/admin/login)
+**URL:** [Link Admin Login Page](https://property-booking-three.vercel.app/login)
 
 | Peran | Email | Kata Sandi |
 |-------|-------|------------|
