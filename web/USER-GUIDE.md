@@ -32,7 +32,7 @@ Panduan ini dirancang untuk:
 
 ### Portal Admin
 
-**URL:** `https://property-booking-three.vercel.app/admin/login`
+**URL:** [Link Admin Login Page](https://property-booking-three.vercel.app/admin/login)
 
 | Peran | Email | Kata Sandi |
 |-------|-------|------------|
@@ -41,7 +41,7 @@ Panduan ini dirancang untuk:
 
 ### Portal Penyewa
 
-**URL:** `https://property-booking-three.vercel.app/admin/login`
+**URL:** [Link Penyewa Login Page](https://property-booking-three.vercel.app/tenant/login)
 
 Akun demo penyewa sudah terisi di halaman login untuk memudahkan pengujian.
 
